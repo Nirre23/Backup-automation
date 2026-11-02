@@ -55,4 +55,4 @@ Om jag skulle fortsätta utveckla projektet skulle jag vilja lägga till stöd f
 
 ## GitHub
 
-[Backup Automation – GitHub](https://github.com/Nirre23/Backup-automation)
+Länk till repo: [Backup Automation – GitHub](https://github.com/Nirre23/Backup-automation)
