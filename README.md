@@ -12,9 +12,9 @@ Jag ville också att lösningen skulle kunna kontrollera att filerna har kopiera
 
 ### Terraform
 
-Terraform används för att skapa filer i mapparna `source` och `backups`, så att mappstrukturen finns på plats.
+Terraform används för att skapa filer i mapparna `source` och `backups`, så att den nödvändiga mappstrukturen finns på plats.
 
-I konfigurationen använder jag Local-providern, en variabel för projektnamnet och en output som visar projektets sökväg.
+I konfigurationen använder jag Local-providern, en variabel för projektnamnet och två resurser som skapar varsin `.keep`-fil.
 
 ### PowerShell
 
@@ -27,6 +27,20 @@ Skriptet:
 - Sparar namnen på de skapade filerna i en lista.
 - Kontrollerar att filerna från den senaste backupen finns på plats.
 - Hanterar fel med hjälp av `try/catch`.
+
+### Startskript
+
+Jag har även skapat `run-backup.ps1`, som automatiserar hela processen.
+
+Det startar först Terraform för att kontrollera och skapa den nödvändiga strukturen. Därefter startas PowerShell-skriptet som genomför och verifierar backupen.
+
+## Köra projektet
+
+För att starta hela processen öppnar man PowerShell i projektets huvudmapp och kör:
+
+```powershell
+./run-backup.ps1
+```
 
 ## Resultat
 
@@ -55,4 +69,4 @@ Om jag skulle fortsätta utveckla projektet skulle jag vilja lägga till stöd f
 
 ## GitHub
 
-Länk till repo: [Backup Automation – GitHub](https://github.com/Nirre23/Backup-automation)
+[Backup Automation – GitHub](https://github.com/Nirre23/Backup-automation)
