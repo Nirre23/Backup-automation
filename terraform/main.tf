@@ -4,9 +4,6 @@ variable "project_name" {
   default = "backup-automation"
 }
 
-variable "environment" {
-  default = "development"
-}
 
 resource "local_file" "source_folder" {
   filename = "../source/.keep"
