@@ -32,10 +32,11 @@ Backupskriptet:
 
 ### Skriptstruktur
 
-Projektet har två separata PowerShell-skript:
+Projektet har tre separata PowerShell-skript:
 
 - `setup-folders.ps1` kör Terraform för att skapa den nödvändiga mappstrukturen.
 - `backup.ps1` genomför själva kopieringen och verifieringen.
+- `cleanup.ps1` raderar mapparna `source` och `backups` så att projektet kan nollställas. Skriptet frågar först och kräver att man skriver `yes` innan något tas bort.
 
 Skripten har separata uppgifter, vilket gör att mapparna kan skapas utan att en backup behöver genomföras varje gång.
 
@@ -66,6 +67,14 @@ För att genomföra backupen kör du:
 
 De skapade backupfilerna hamnar i `backups`.
 
+För att nollställa projektet (raderar `source` och `backups`) kör du:
+
+```powershell
+./scripts/cleanup.ps1
+```
+
+Skriptet kräver att du skriver `yes` för att bekräfta. Efteråt kan du köra `setup-folders.ps1` igen för att skapa mapparna på nytt.
+
 ## Resultat
 
 Resultatet blev en fungerande lokal backup-lösning där Terraform skapar mappstrukturen och PowerShell kopierar och verifierar filerna.
@@ -74,11 +83,13 @@ Varje backupfil får en tidsstämpel i filnamnet, vilket gör att tidigare backu
 
 Jag har testat hela processen genom att ta bort mapparna och därefter återskapa dem med Terraform. Jag har också testat backupfunktionen med testfiler och kontrollerat att kopiorna skapas i rätt mapp. Verifieringen kontrollerar att de skapade backupfilerna finns på plats.
 
+Jag har även testat vad som händer när källmappen är tom. Då stannar skriptet och visar ett tydligt felmeddelande i stället för att skapa en tom backup.
+
 ## Reflektion
 
 Under projektet har jag lärt mig hur Terraform och PowerShell kan samarbeta för att automatisera uppgifter som annars hade tagit mycket tid att göra manuellt.
 
-I PowerShell fick jag en bättre förståelse för variabler, funktioner, loopar och felhantering. Särskilt felhanteringen tyckte jag var krånglig i början, men den blev tydligare ju mer jag använde den. Med Terraform lärde jag mig att skapa och hantera filer och mappar på ett strukturerat sätt.
+I PowerShell fick jag en bättre förståelse för variabler, funktioner, loopar och felhantering. Särskilt felhanteringen tyckte jag var svår i början, men den blev tydligare ju mer jag använde den. Med Terraform lärde jag mig att skapa och hantera filer och mappar på ett strukturerat sätt.
 
 Om jag fortsatte utveckla projektet skulle jag vilja:
 
