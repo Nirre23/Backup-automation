@@ -1,6 +1,8 @@
 
-$source = "./source"
-$backup = "./backups"
+$projectPath = Split-Path -Parent $PSScriptRoot
+
+$source = Join-Path $projectPath "source"
+$backup = Join-Path $projectPath "backups"
 
 function Test-BackupFolders {
     param (
@@ -23,32 +25,26 @@ function Start-Backup {
         [string]$backup
     )
 
-    try {
-        $timeStamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
+    $timeStamp = Get-Date -Format "yyyy-MM-dd_HH.mm.ss"
 
-        $files = @(Get-ChildItem -Path $source -File)
-        $fileCount = $files.Count
-        $createdFiles = @()
+    $files = @(Get-ChildItem -Path $source -File)
+    $fileCount = $files.Count
+    $createdFiles = @()
 
-        foreach ($file in $files) {
-            $newName = "$($file.BaseName)_$timeStamp$($file.Extension)"
+    foreach ($file in $files) {
+        $newName = "$($file.BaseName)_$timeStamp$($file.Extension)"
 
-            Copy-Item -Path $file.FullName -Destination (Join-Path $backup $newName) -ErrorAction Stop
+        Copy-Item -Path $file.FullName -Destination (Join-Path $backup $newName) -ErrorAction Stop
 
-            $createdFiles += $newName
-        }
-
-        Write-Host "Created backup files:" -ForegroundColor DarkMagenta
-        Write-Host $createdFiles -ForegroundColor Cyan
-
-        Write-Host "Backup completed successfully! Files copied: $fileCount" -ForegroundColor Green
-
-        return $createdFiles
+        $createdFiles += $newName
     }
-    catch {
-        Write-Host "Backup failed: $($_.Exception.Message)" -ForegroundColor DarkRed
-        return @()
-    }
+
+    Write-Host "Created backup files:" -ForegroundColor DarkMagenta
+    Write-Host $createdFiles -ForegroundColor Cyan
+
+    Write-Host "Backup completed successfully! Files copied: $fileCount" -ForegroundColor Green
+
+    return $createdFiles
 }
 
 function Test-BackupResult {
@@ -74,15 +70,12 @@ function Test-BackupResult {
 }
 
 try {
-
-
     Test-BackupFolders -source $source -backup $backup
 
     $createdFiles = Start-Backup -source $source -backup $backup
 
     Test-BackupResult -backup $backup -createdFiles $createdFiles
-
 }
 catch {
-    Write-Host "Error:$($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "Backup failed: $($_.Exception.Message)" -ForegroundColor Red
 }

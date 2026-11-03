@@ -2,63 +2,70 @@
 
 ## Mål
 
-Målet med projektet var att bygga en enkel automatiserad backup-lösning med hjälp av Terraform och PowerShell.
+Målet med projektet var att bygga en enkel lokal backup-lösning med hjälp av Terraform och PowerShell.
 
-Tanken är att Terraform ska skapa den mappstruktur som behövs, medan PowerShell sköter själva backupen genom att kopiera filer från en källmapp till en backupmapp.
+Terraform används för att skapa den mappstruktur som behövs, medan PowerShell sköter själva backupen genom att kopiera filer från en källmapp till en backupmapp.
 
-Jag ville också att lösningen skulle kunna kontrollera att filerna har kopierats och hantera fel om något går fel under körningen.
+Lösningen ska även kunna kontrollera att filerna har kopierats och hantera fel om något går fel under körningen.
 
 ## Så fungerar det
 
 ### Terraform
 
-Terraform används för att skapa filer i mapparna `source` och `backups`, så att den nödvändiga mappstrukturen finns på plats.
+Terraform används för att skapa mapparna `source` och `backups`.
 
-I konfigurationen använder jag Local-providern, en variabel för projektnamnet och två resurser som skapar varsin `.keep`-fil.
+Jag använder Local-providern och två resurser av typen `local_file`. Dessa skapar varsin tom `.keep`-fil i respektive mapp. På så sätt skapas mapparna automatiskt om de saknas.
+
+Jag har även lagt till två outputs som visar sökvägarna till mapparna.
 
 ### PowerShell
 
 PowerShell används för att genomföra och kontrollera backupen.
 
-Skriptet:
+Backupskriptet:
 - Kontrollerar att källmappen och backupmappen finns.
 - Hämtar filerna från källmappen.
 - Kopierar filerna till backupmappen med en tidsstämpel i filnamnet.
 - Sparar namnen på de skapade filerna i en lista.
-- Kontrollerar att filerna från den senaste backupen finns på plats.
+- Kontrollerar att de skapade backupfilerna finns på plats.
 - Hanterar fel med hjälp av `try/catch`.
 
-### Startskript
+### Skriptstruktur
 
-Jag har även skapat `run-backup.ps1`, som automatiserar hela processen.
+Projektet har två separata PowerShell-skript:
 
-Det startar först Terraform för att kontrollera och skapa den nödvändiga strukturen. Därefter startas PowerShell-skriptet som genomför och verifierar backupen.
+- `setup-folders.ps1` kör Terraform för att skapa den nödvändiga mappstrukturen.
+- `backup.ps1` genomför själva kopieringen och verifieringen.
+
+Skripten har separata uppgifter, vilket gör att mapparna kan skapas utan att en backup behöver genomföras varje gång.
 
 ## Köra projektet
 
-För att starta hela processen öppnar man PowerShell i projektets huvudmapp och kör:
+Öppna PowerShell i projektets huvudmapp.
+
+För att skapa mappstrukturen kör du:
 
 ```powershell
-./run-backup.ps1
+./scripts/setup-folders.ps1
 ```
+
+Lägg sedan filer som ska säkerhetskopieras i `source`.
+
+För att genomföra backupen kör du:
+
+```powershell
+./scripts/backup.ps1
+```
+
+De skapade backupfilerna hamnar i `backups`.
 
 ## Resultat
 
-Resultatet blev en fungerande backup-lösning där filer kopieras från källmappen till backupmappen.
+Resultatet blev en fungerande lokal backup-lösning där Terraform skapar mappstrukturen och PowerShell kopierar och verifierar filerna.
 
-Varje fil får en tidsstämpel i filnamnet, vilket gör att tidigare backuper finns kvar utan att skrivas över.
+Varje backupfil får en tidsstämpel i filnamnet, vilket gör att tidigare backuper finns kvar utan att skrivas över.
 
-Jag har testat lösningen med flera filer och kontrollerat att kopiorna hamnar i rätt mapp. Jag har även testat vad som händer när källmappen saknas. Då upptäcker skriptet felet och visar ett tydligt felmeddelande.
-
-## Reflektion
-
-Under projektet har jag lärt mig mer om hur Terraform och PowerShell kan användas tillsammans för att automatisera uppgifter som annars hade behövt göras manuellt.
-
-I PowerShell har jag fått bättre förståelse för variabler, funktioner, loopar och felhantering. Särskilt felhanteringen tyckte jag var krånglig i början, men den blev tydligare ju mer jag arbetade med den.
-
-Med Terraform har jag lärt mig hur man kan beskriva och skapa en mappstruktur med hjälp av kod.
-
-Om jag skulle fortsätta utveckla projektet skulle jag vilja lägga till stöd för undermappar, så att även filer i underliggande mappar kan säkerhetskopieras. Jag skulle också vilja automatisera körningen så att backuper skapas enligt ett schema. En annan förbättring vore att kunna rensa eller arkivera gamla backuper för att undvika att de tar upp onödigt mycket lagringsutrymme.
+Jag har testat hela processen genom att ta bort mapparna och därefter återskapa dem med Terraform. Jag har också testat backupfunktionen med testfiler och kontrollerat att kopiorna skapas i rätt mapp. Verifieringen kontrollerar att de skapade backupfilerna finns på plats.
 
 ## Verktyg
 
@@ -69,4 +76,4 @@ Om jag skulle fortsätta utveckla projektet skulle jag vilja lägga till stöd f
 
 ## GitHub
 
-[Backup Automation – GitHub](https://github.com/Nirre23/Backup-automation)
+Länk till repo: [Backup Automation – GitHub](https://github.com/Nirre23/Backup-automation)

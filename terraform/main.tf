@@ -1,18 +1,19 @@
 provider "local" {}
 
-variable "project_name" {
-  default = "backup-automation"
-}
-
 resource "local_file" "source_folder" {
   filename = "../source/.keep"
-  content  = "# Källmapp för ${var.project_name}"
+  content  = ""
 }
 
 resource "local_file" "backup_folder" {
   filename = "../backups/.keep"
-  content  = "# Backupmapp för ${var.project_name}"
+  content  = ""
 }
 
+output "source_directory" {
+  value = dirname(local_file.source_folder.filename)
+}
 
-
+output "backup_directory" {
+  value = dirname(local_file.backup_folder.filename)
+}
