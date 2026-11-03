@@ -1,12 +1,22 @@
 provider "local" {}
 
+variable "source_dir" {
+  type    = string
+  default = "../source"
+}
+
+variable "backup_dir" {
+  type    = string
+  default = "../backups"
+}
+
 resource "local_file" "source_folder" {
-  filename = "../source/.keep"
+  filename = "${var.source_dir}/.keep"
   content  = ""
 }
 
 resource "local_file" "backup_folder" {
-  filename = "../backups/.keep"
+  filename = "${var.backup_dir}/.keep"
   content  = ""
 }
 
