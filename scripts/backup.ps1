@@ -1,4 +1,3 @@
-
 $projectPath = Split-Path -Parent $PSScriptRoot
 
 $source = Join-Path $projectPath "source"
@@ -10,11 +9,11 @@ function Test-BackupFolders {
         [string]$backup
     )
 
-    if (!(Test-Path $source)) {
+    if (!(Test-Path -LiteralPath $source)) {
         throw "Source folder missing: $source"
     }
 
-    if (!(Test-Path $backup)) {
+    if (!(Test-Path -LiteralPath $backup)) {
         throw "Backup folder missing: $backup"
     }
 }
@@ -27,20 +26,24 @@ function Start-Backup {
 
     $timeStamp = Get-Date -Format "yyyy-MM-dd_HH.mm.ss"
 
-    $files = @(Get-ChildItem -Path $source -File)
+    $files = @(Get-ChildItem -LiteralPath $source -File)
     $fileCount = $files.Count
     $createdFiles = @()
+
+    if ($fileCount -eq 0) {
+        throw "No files found in source folder: $source"
+    }
 
     foreach ($file in $files) {
         $newName = "$($file.BaseName)_$timeStamp$($file.Extension)"
 
-        Copy-Item -Path $file.FullName -Destination (Join-Path $backup $newName) -ErrorAction Stop
+        Copy-Item -LiteralPath $file.FullName -Destination (Join-Path $backup $newName) -ErrorAction Stop
 
         $createdFiles += $newName
     }
 
     Write-Host "Created backup files:" -ForegroundColor DarkMagenta
-    Write-Host $createdFiles -ForegroundColor Cyan
+    $createdFiles | ForEach-Object { Write-Host $_ -ForegroundColor Cyan }
 
     Write-Host "Backup completed successfully! Files copied: $fileCount" -ForegroundColor Green
 
@@ -56,7 +59,7 @@ function Test-BackupResult {
     $successCount = 0
 
     foreach ($file in $createdFiles) {
-        if (Test-Path (Join-Path $backup $file)) {
+        if (Test-Path -LiteralPath (Join-Path $backup $file)) {
             $successCount++
         }
     }
