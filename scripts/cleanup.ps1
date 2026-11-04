@@ -1,8 +1,11 @@
+# Get the main project folder
 $projectPath = Split-Path -Parent $PSScriptRoot
 
+# Set the source and backup folder paths
 $source = Join-Path $projectPath "source"
 $backup = Join-Path $projectPath "backups"
 
+# Remove folder if it exists
 function Remove-ProjectFolder {
     param ([string]$path)
 
@@ -15,10 +18,12 @@ function Remove-ProjectFolder {
     }
 }
 
+# Ask for confirmation before deleting anything
 try {
     Write-Host "WARNING: This will delete the source and backups folders, including all their contents!" -ForegroundColor Red
     $confirmation = Read-Host "Are you sure you want to continue? (yes/no)"
 
+    # Only continue if the user confirms with "yes"
     if ($confirmation -ieq "yes") {
         Remove-ProjectFolder $source
         Remove-ProjectFolder $backup
