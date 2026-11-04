@@ -2,13 +2,13 @@
 $projectPath = Split-Path -Parent $PSScriptRoot
 $terraformPath = Join-Path $projectPath "terraform"
 
-# Start terraform
+# Start Terraform
 Write-Host "Starting Terraform..." -ForegroundColor Cyan
 
-#Initialize terraform
+# Initialize Terraform
 terraform "-chdir=$terraformPath" init -input=false
 
-# Stop of initialization fails
+# Check if initialization was successful
 if ($LASTEXITCODE -ne 0) {
     throw "Terraform initialization failed."
 }
@@ -16,9 +16,9 @@ if ($LASTEXITCODE -ne 0) {
 # Create the folders using terraform and auto-approve
 terraform "-chdir=$terraformPath" apply -auto-approve
 
-# Stop if the setup fails
+# Check if folder creation was successful
 if ($LASTEXITCODE -ne 0) {
     throw "Terraform apply failed."
 }
-# Successmessage
+# Show success message
 Write-Host "Folder setup completed successfully!" -ForegroundColor Green
