@@ -21,39 +21,34 @@ function Test-BackupFolders {
     }
 }
 
-# Copy files from the source folder to the bacckup folder
+# Copy files from the source folder to the backup folder
 function Start-Backup {
     param (
         [string]$source,
         [string]$backup
     )
+
     # Add the current date and time to the backup file names
     $timeStamp = Get-Date -Format "yyyy-MM-dd_HH.mm.ss"
 
     # Get all the files in the source folder
     $files = @(Get-ChildItem -LiteralPath $source -File)
     $fileCount = $files.Count
-    $createdFiles = @()
 
-    # Stop if there are no files to backup
+    # Stop if there are no files to back up
     if ($fileCount -eq 0) {
         throw "No files found in source folder: $source"
     }
-    # Copy each file with a new name
+
+    # Copy each file with a new name and remember the names
+    $createdFiles = @()
     foreach ($file in $files) {
         $newName = "$($file.BaseName)_$timeStamp$($file.Extension)"
-
         Copy-Item -LiteralPath $file.FullName -Destination (Join-Path $backup $newName) -ErrorAction Stop
-
         $createdFiles += $newName
     }
 
-    # Show the names of the copied files
-    Write-Host "Created backup files:" -ForegroundColor DarkMagenta
-    $createdFiles | ForEach-Object { Write-Host $_ -ForegroundColor Cyan }
-
-    Write-Host "Backup completed successfully! Files copied: $fileCount" -ForegroundColor Green
-
+    Write-Host "Backup completed! Files copied: $fileCount" -ForegroundColor Green
     return $createdFiles
 }
 
@@ -64,29 +59,27 @@ function Test-BackupResult {
         [string[]]$createdFiles
     )
 
-    $successCount = 0
-    # Check each file in the backup folder
+    # Collect the names of any files that are missing
+    $missing = @()
     foreach ($file in $createdFiles) {
-        if (Test-Path -LiteralPath (Join-Path $backup $file)) {
-            $successCount++
+        if (!(Test-Path -LiteralPath (Join-Path $backup $file))) {
+            $missing += $file
         }
     }
 
-    # Show whether tha backup was successfull
-    if ($successCount -eq $createdFiles.Count -and $createdFiles.Count -gt 0) {
+    # Show whether the backup was successful
+    if ($missing.Count -eq 0) {
         Write-Host "Backup verification successful!" -ForegroundColor Green
     }
     else {
-        Write-Host "Backup verification failed!" -ForegroundColor Red
+        throw "Backup verification failed. Missing files: $($missing -join ', ')"
     }
 }
 
 # Run the backup and handle any errors
 try {
     Test-BackupFolders -source $source -backup $backup
-
     $createdFiles = Start-Backup -source $source -backup $backup
-
     Test-BackupResult -backup $backup -createdFiles $createdFiles
 }
 catch {
