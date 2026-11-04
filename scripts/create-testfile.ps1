@@ -13,22 +13,19 @@ function New-TestFile {
         throw "Source folder missing: $folder"
     }
 
-    # Count existing test files
-    $existing = @(Get-ChildItem -LiteralPath $folder -File -Filter "test_*.txt")
-    $number = $existing.Count + 1
-
-    # Create a filename, for example test_001.txt
+    # Start with the first file number
+    $number = 1
     $fileName = "test_{0:D3}.txt" -f $number
     $filePath = Join-Path $folder $fileName
 
-    # If the name is already taken , try the next number
+    # If the name is already taken, try the next number
     while (Test-Path -LiteralPath $filePath) {
         $number++
         $fileName = "test_{0:D3}.txt" -f $number
         $filePath = Join-Path $folder $fileName
     }
 
-    # Add som text and the current date and time to the file
+    # Add some text and the current date and time to the file
     $content = "Test file number $number created $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
     Set-Content -LiteralPath $filePath -Value $content -ErrorAction Stop
 
