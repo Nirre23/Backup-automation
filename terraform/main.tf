@@ -1,6 +1,3 @@
-# Use the local provider to create files on THIS computer
-provider "local" {}
-
 # Create the backup folder by adding a .keep file
 resource "local_file" "source_folder" {
   filename = "${var.source_dir}/.keep"
