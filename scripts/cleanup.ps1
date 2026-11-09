@@ -14,7 +14,7 @@ function Remove-ProjectFolder {
         Write-Host "Removed: $path" -ForegroundColor Yellow
     }
     else {
-        Write-Host "Folder already missing: $path" -ForegroundColor Gray
+        Write-Host "Folder already missing: $path" -ForegroundColor Blue
     }
 }
 
@@ -28,7 +28,7 @@ try {
         Remove-ProjectFolder $source
         Remove-ProjectFolder $backup
 
-        Write-Host "Cleanup completed successfully!" -ForegroundColor Green
+        Write-Host "Cleanup completed! (Missing folders were skipped)" -ForegroundColor Green
     }
     else {
         Write-Host "Cleanup cancelled." -ForegroundColor Yellow

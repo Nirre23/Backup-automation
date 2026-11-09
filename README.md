@@ -14,12 +14,10 @@ Lösningen kan även kontrollera att filerna har kopierats och hantera fel om n�
 
 Terraform används för att skapa mapparna `source` och `backups`.
 
-Jag använder Local-providern och två resurser av typen `local_file`. Dessa skapar varsin tom `.keep`-fil i respektive mapp. På så sätt skapas mapparna automatiskt om de saknas.
+Jag använder Local Provider och två resurser av typen `local_file`. Dessa skapar varsin tom `.keep`-fil i respektive mapp. På så sätt skapas mapparna automatiskt om de inte redan finns.
 
-Jag har delat upp Terraform-konfigurationen i två filer:
+Mappen `terraform` innehåller filen `main.tf`, som innehåller variabler, provider-konfiguration, resurser och outputs.
 
-- `main.tf` innehåller resurser och outputs.
-- `variables.tf` innehåller variablerna för sökvägarna till mapparna.
 
 Sökvägarna styrs av variabler, vilket gör dem enkla att ändra. Jag har även lagt till två outputs som visar sökvägarna till mapparna.
 
