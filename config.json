@@ -1,0 +1,6 @@
+{
+    "sourceFolder": "source",
+    "backupFolder": "backups",
+    "filePrefix": "backup",
+    "timestampFormat": "yyyy-MM-dd_HH.mm.ss"
+}

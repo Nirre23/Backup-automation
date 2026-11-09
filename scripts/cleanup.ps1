@@ -1,10 +1,10 @@
-# Get the main project folder
 $projectPath = Split-Path -Parent $PSScriptRoot
 
-# Set the source and backup folder paths
-$source = Join-Path $projectPath "source"
-$backup = Join-Path $projectPath "backups"
+$configPath = Join-Path $projectPath "config.json"
+$config = Get-Content -Path $configPath -Raw | ConvertFrom-Json
 
+$source = Join-Path $projectPath $config.sourceFolder
+$backup = Join-Path $projectPath $config.backupFolder
 # Remove folder if it exists
 function Remove-ProjectFolder {
     param ([string]$path)

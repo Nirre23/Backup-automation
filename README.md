@@ -4,9 +4,9 @@
 
 Målet med projektet var att bygga en enkel lokal backup-lösning med hjälp av Terraform och PowerShell.
 
-Terraform används för att skapa den mappstruktur som behövs, medan PowerShell sköter själva backupen genom att kopiera filer från en källmapp till en backupmapp.
+Terraform används för att skapa den mappstruktur som behövs, medan PowerShell sköter automatiseringen av testfiler och själva backupen genom att kopiera filer från en källmapp till en backupmapp.
 
-Lösningen kan även kontrollera att filerna har kopierats och hantera fel om något går fel under körningen.
+Lösningen kontrollerar även att filerna har kopierats korrekt och hanterar fel som kan uppstå under körningen.
 
 ## Metod
 
@@ -16,24 +16,36 @@ Terraform används för att skapa mapparna `source` och `backups`.
 
 Jag använder Local Provider och två resurser av typen `local_file`. Dessa skapar varsin tom `.keep`-fil i respektive mapp. På så sätt skapas mapparna automatiskt om de inte redan finns.
 
-Mappen `terraform` innehåller filen `main.tf`, som innehåller variabler, provider-konfiguration, resurser och outputs.
-
+Mappen `terraform` innehåller filen `main.tf`, som innehåller provider-konfiguration, variabler, resurser och outputs.
 
 Sökvägarna styrs av variabler, vilket gör dem enkla att ändra. Jag har även lagt till två outputs som visar sökvägarna till mapparna.
 
 ### PowerShell
 
-PowerShell används för att automatisera körningen, genomföra backupen och kontrollera resultatet.
+PowerShell används för att automatisera körningen, skapa testfiler, genomföra backupen och kontrollera resultatet.
 
 Backupskriptet:
 - Kontrollerar att källmappen och backupmappen finns.
 - Hämtar filerna från källmappen.
 - Kopierar filerna till backupmappen med en tidsstämpel i filnamnet.
+- Använder ett filprefix för att skilja backupfilerna från originalfilerna.
 - Sparar namnen på de skapade filerna i en lista.
-- Kontrollerar att de skapade backupfilerna finns på plats.
+- Kontrollerar att backupfilerna finns på plats.
 - Hanterar fel med hjälp av `try/catch`.
 
-Jag har även skapat ett separat skript för testfiler. Det skapar automatiskt textfiler i källmappen med löpnummer, exempelvis `test_001.txt`, `test_002.txt` och så vidare. Varje fil får också innehåll med ett datum och klockslag för när den skapades.
+Jag har även skapat ett separat skript för testfiler. Det skapar automatiskt textfiler i källmappen med löpnummer, exempelvis `test_001.txt`, `test_002.txt` och så vidare. Varje fil får även innehåll med datum och klockslag för när den skapades.
+
+### Konfigurationsfil
+
+Projektet använder en gemensam `config.json` för inställningar som används av PowerShell-skripten.
+
+Filen innehåller:
+- `sourceFolder` – namnet på källmappen.
+- `backupFolder` – namnet på backupmappen.
+- `filePrefix` – prefix som används i backupfilernas namn.
+- `timestampFormat` – formatet för datum och klockslag.
+
+Det gör att vissa inställningar kan ändras på ett ställe i stället för direkt i skripten.
 
 ### Skriptstruktur
 
@@ -64,6 +76,8 @@ Skripten har separata uppgifter, vilket gör att mappar kan skapas, testfiler ge
 ./scripts/setup-folders.ps1
 ```
 
+Skriptet initierar Terraform och kör konfigurationen för att skapa mapparna.
+
 **2. Skapa en testfil**
 
 ```powershell
@@ -78,7 +92,7 @@ Skriptet skapar en textfil i `source`. Du kan även lägga egna filer där.
 ./scripts/backup.ps1
 ```
 
-De skapade backupfilerna hamnar i `backups`.
+De skapade backupfilerna hamnar i `backups`. Varje fil får ett prefix och en tidsstämpel i filnamnet.
 
 **4. Nollställa projektet**
 
@@ -86,13 +100,15 @@ De skapade backupfilerna hamnar i `backups`.
 ./scripts/cleanup.ps1
 ```
 
-Skriptet kräver att du skriver `yes` för att bekräfta. Observera att både `source` och `backups` tas bort tillsammans med allt innehåll. Efteråt kan du köra `setup-folders.ps1` igen för att skapa mapparna på nytt.
+Skriptet kräver att du skriver `yes` för att bekräfta. Observera att både `source` och `backups` tas bort tillsammans med allt innehåll.
+
+Efteråt kan du köra `setup-folders.ps1` igen för att skapa mapparna på nytt.
 
 ## Resultat
 
 Resultatet blev en fungerande lokal backup-lösning där Terraform skapar mappstrukturen och PowerShell skapar testfiler, kopierar filer och verifierar resultatet.
 
-Varje backupfil får en tidsstämpel i filnamnet, vilket gör att tidigare backuper finns kvar utan att skrivas över.
+Varje backupfil får ett prefix och en tidsstämpel i filnamnet, vilket gör att tidigare backuper finns kvar utan att skrivas över.
 
 Jag har testat processen genom att ta bort mapparna och därefter återskapa dem med Terraform. Jag har också testat backupfunktionen med testfiler och kontrollerat att kopiorna skapas i rätt mapp.
 

@@ -1,9 +1,11 @@
-# Get the main project folder
+# Get the project paht and load the shared configuration
 $projectPath = Split-Path -Parent $PSScriptRoot
 
-# Set the source and backup folder paths
-$source = Join-Path $projectPath "source"
-$backup = Join-Path $projectPath "backups"
+$configPath = Join-Path $projectPath "config.json"
+$config = Get-Content -Path $configPath -Raw | ConvertFrom-Json
+
+$source = Join-Path $projectPath $config.sourceFolder
+$backup = Join-Path $projectPath $config.backupFolder
 
 # Check that both folders exists
 function Test-BackupFolders {
@@ -29,7 +31,7 @@ function Start-Backup {
     )
 
     # Add the current date and time to the backup file names
-    $timeStamp = Get-Date -Format "yyyy-MM-dd_HH.mm.ss"
+    $timeStamp = Get-Date -Format $config.timestampFormat
 
     # Get all the files in the source folder
     $files = @(Get-ChildItem -LiteralPath $source -File)
@@ -43,10 +45,11 @@ function Start-Backup {
     # Copy each file with a new name and remember the names
     $createdFiles = @()
     foreach ($file in $files) {
-        $newName = "$($file.BaseName)_$timeStamp$($file.Extension)"
+        $newName = "$($config.filePrefix)_$($file.BaseName)_$timeStamp$($file.Extension)"
         Copy-Item -LiteralPath $file.FullName -Destination (Join-Path $backup $newName) -ErrorAction Stop
         $createdFiles += $newName
     }
+
 
     Write-Host "Backup completed! Files copied: $fileCount" -ForegroundColor Green
     return $createdFiles

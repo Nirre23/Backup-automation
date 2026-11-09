@@ -1,5 +1,7 @@
 # Get the main project folder
 $projectPath = Split-Path -Parent $PSScriptRoot
+
+# Get the Terraform folder path
 $terraformPath = Join-Path $projectPath "terraform"
 
 # Start Terraform

@@ -1,7 +1,9 @@
-# Get the main project folder
 $projectPath = Split-Path -Parent $PSScriptRoot
-$source = Join-Path $projectPath "source"
 
+$configPath = Join-Path $projectPath "config.json"
+$config = Get-Content -Path $configPath -Raw | ConvertFrom-Json
+
+$source = Join-Path $projectPath $config.sourceFolder
 # Create a new test file in the source folder
 function New-TestFile {
     param (
@@ -26,7 +28,7 @@ function New-TestFile {
     }
 
     # Add some text and the current date and time to the file
-    $content = "Test file number $number created $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+    $content = "Test file number $number was created $(Get-Date -Format $config.timestampFormat)"
     Set-Content -LiteralPath $filePath -Value $content -ErrorAction Stop
 
     Write-Host "Created test file: $fileName" -ForegroundColor Green
