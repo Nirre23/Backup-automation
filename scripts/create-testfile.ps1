@@ -15,17 +15,15 @@ function New-TestFile {
         throw "Source folder missing: $folder"
     }
 
-    # Start with the first file number
+    # Find the first available file number
     $number = 1
-    $fileName = "test_{0:D3}.txt" -f $number
-    $filePath = Join-Path $folder $fileName
 
-    # If the name is already taken, try the next number
-    while (Test-Path -LiteralPath $filePath) {
+    while (Test-Path -LiteralPath (Join-Path $folder "test_$number.txt")) {
         $number++
-        $fileName = "test_{0:D3}.txt" -f $number
-        $filePath = Join-Path $folder $fileName
     }
+
+    $fileName = "test_$number.txt"
+    $filePath = Join-Path $folder $fileName
 
     # Add some text and the current date and time to the file
     $content = "Test file number $number was created $(Get-Date -Format $config.timestampFormat)"
