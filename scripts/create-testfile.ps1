@@ -21,7 +21,7 @@ function New-TestFile {
     while (Test-Path -LiteralPath (Join-Path $folder "test_$number.txt")) {
         $number++
     }
-
+    # Create the file name and full file path
     $fileName = "test_$number.txt"
     $filePath = Join-Path $folder $fileName
 
