@@ -25,8 +25,9 @@ try {
 
     # Only continue if the user confirms with "yes"
     if ($confirmation -ieq "yes") {
-        Remove-ProjectFolder -path $source
-        Remove-ProjectFolder -path $backup
+        foreach ($folder in @($source, $backup)) {
+            Remove-ProjectFolder -path $folder
+        }
 
         Write-Host "Cleanup completed! (Missing folders were skipped)" -ForegroundColor Green
     }
