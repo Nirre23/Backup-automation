@@ -32,7 +32,7 @@ function New-TestFile {
     Set-Content -LiteralPath $filePath -Value $content -ErrorAction Stop
 
     Write-Host "Created test file: $fileName" -ForegroundColor Green
-    return $fileName
+
 }
 
 # Create the test file and handle any errors
