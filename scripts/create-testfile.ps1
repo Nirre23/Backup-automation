@@ -37,7 +37,7 @@ function New-TestFile {
 
 # Create the test file and handle any errors
 try {
-    New-TestFile -folder $source | Out-Null
+    New-TestFile -folder $source
 }
 catch {
     Write-Host "Could not create test file: $($_.Exception.Message)" -ForegroundColor Red
