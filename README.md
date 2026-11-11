@@ -1,141 +1,150 @@
 # Backup Automation
 
-## Mål
+## Goal
 
-Målet med projektet var att bygga en enkel lokal backup-lösning med hjälp av Terraform och PowerShell.
+The goal of this project is to build a simple local backup solution using Terraform and PowerShell.
 
-Terraform används för att skapa den mappstruktur som behövs, medan PowerShell sköter automatiseringen av testfiler och själva backupen genom att kopiera filer från en källmapp till en backupmapp.
+Terraform creates the required folders and generates the project's configuration file. PowerShell creates test files and runs the backup by copying files from a source folder to a backup folder.
 
-Lösningen kontrollerar även att filerna har kopierats korrekt och hanterar fel som kan uppstå under körningen.
+The solution also checks that the files were copied correctly and handles errors that may happen while it runs.
 
-## Metod
+## How it works
 
 ### Terraform
 
-Terraform används för att skapa mapparna `source` och `backups`.
+Terraform creates the `source` and `backups` folders.
 
-Jag använder Local Provider och två resurser av typen `local_file`. Dessa skapar varsin tom `.keep`-fil i respektive mapp. På så sätt skapas mapparna automatiskt om de inte redan finns.
+I use the Local provider and `local_file` resources to create an empty `.keep` file in each folder. This also creates the folders if they do not already exist.
 
-Mappen `terraform` innehåller filen `main.tf`, som innehåller provider-konfiguration, variabler, resurser och outputs.
+The `terraform/main.tf` file contains the provider settings, variables, resources, and outputs. The folder paths are set with variables, so they are easy to change.
 
-Sökvägarna styrs av variabler, vilket gör dem enkla att ändra. Jag har även lagt till två outputs som visar sökvägarna till mapparna.
+Terraform also creates the project's `config.json` file using `jsonencode()`. This file contains shared settings used by the PowerShell scripts.
+
+I have also added outputs that show the paths to the source folder, backup folder, and configuration file.
 
 ### PowerShell
 
-PowerShell används för att automatisera körningen, skapa testfiler, genomföra backupen och kontrollera resultatet.
+PowerShell creates test files, runs the backup, and checks the result.
 
-Backupskriptet:
-- Kontrollerar att källmappen och backupmappen finns.
-- Hämtar filerna från källmappen.
-- Kopierar filerna till backupmappen med en tidsstämpel i filnamnet.
-- Använder ett filprefix för att skilja backupfilerna från originalfilerna.
-- Sparar namnen på de skapade filerna i en lista.
-- Kontrollerar att backupfilerna finns på plats.
-- Hanterar fel med hjälp av `try/catch`.
+The backup script:
 
-Jag har även skapat ett separat skript för testfiler. Det skapar automatiskt textfiler i källmappen med löpnummer, exempelvis `test_001.txt`, `test_002.txt` och så vidare. Varje fil får även innehåll med datum och klockslag för när den skapades.
+- Checks that the source and backup folders exist.
+- Gets files directly from the source folder. It does not search subfolders.
+- Copies the files to the backup folder with a prefix and timestamp in each file name.
+- Saves the names of the new files in a list.
+- Checks that the backup files exist.
+- Handles errors using `try/catch`.
 
-### Konfigurationsfil
+I have also created a separate script for test files. It creates text files in the source folder with increasing numbers, such as `test_1.txt`, `test_2.txt`, and so on. Each file also contains the date and time when it was created.
 
-Projektet använder en gemensam `config.json` för inställningar som används av PowerShell-skripten.
+### Configuration file
 
-Filen innehåller:
-- `sourceFolder` – namnet på källmappen.
-- `backupFolder` – namnet på backupmappen.
-- `filePrefix` – prefix som används i backupfilernas namn.
-- `timestampFormat` – formatet för datum och klockslag.
+The project uses a shared `config.json` file created by Terraform.
 
-Det gör att vissa inställningar kan ändras på ett ställe i stället för direkt i skripten.
+The file contains:
 
-### Skriptstruktur
+- `sourceFolder` – the name of the source folder.
+- `backupFolder` – the name of the backup folder.
+- `filePrefix` – the prefix used in backup file names.
+- `timestampFormat` – the format used for the date and time.
 
-Projektet har fyra separata PowerShell-skript:
+The test file script and backup script read their settings from this file. The cleanup script does not need to read the JSON file. Instead, it uses fixed paths to remove both folders and the configuration file.
 
-- `setup-folders.ps1` kör Terraform för att skapa den nödvändiga mappstrukturen.
-- `create-testfile.ps1` skapar testfiler i källmappen med automatiska löpnummer.
-- `backup.ps1` genomför själva kopieringen och verifieringen.
-- `cleanup.ps1` raderar mapparna `source` och `backups` så att projektet kan nollställas. Skriptet frågar först och kräver att man skriver `yes` innan något tas bort.
+### Scripts
 
-Skripten har separata uppgifter, vilket gör att mappar kan skapas, testfiler genereras och backuper genomföras var för sig.
+The project has four separate PowerShell scripts:
 
-### Verktyg
+- `scripts/setup-folders.ps1` starts Terraform and applies the configuration to create the folders and `config.json`.
+- `scripts/create-testfile.ps1` creates test files in the source folder with increasing numbers.
+- `scripts/backup.ps1` copies the files and checks that the backup files exist.
+- `scripts/cleanup.ps1` asks for confirmation before removing the `source` and `backups` folders and the `config.json` file. You must enter `yes` to continue.
+
+Each script has its own task. You can create the folders, make test files, run backups, and reset the project separately.
+
+### Tools
 
 - PowerShell 7
 - Terraform
 - WSL2 (Ubuntu)
 - Visual Studio Code
-- Git och GitHub
+- Git and GitHub
 
-## Köra projektet
+## Running the project
 
-Öppna PowerShell i projektets huvudmapp.
+Open PowerShell in the project's main folder.
 
-**1. Skapa mappstrukturen**
+**1. Create the folders**
 
 ```powershell
 ./scripts/setup-folders.ps1
 ```
 
-Skriptet initierar Terraform och kör konfigurationen för att skapa mapparna.
+The script starts Terraform and creates the folders and `config.json`.
 
-**2. Skapa en testfil**
+**2. Create test files**
 
 ```powershell
 ./scripts/create-testfile.ps1
 ```
 
-Skriptet skapar en textfil i `source`. Du kan även lägga egna filer där.
+The script creates a text file in `source`. You can also add your own files there.
 
-**3. Genomföra backupen**
+**3. Run the backup**
 
 ```powershell
 ./scripts/backup.ps1
 ```
 
-De skapade backupfilerna hamnar i `backups`. Varje fil får ett prefix och en tidsstämpel i filnamnet.
+The backup files are saved in `backups`. Each file name includes a prefix and timestamp.
 
-**4. Nollställa projektet**
+**4. Reset the project**
 
 ```powershell
 ./scripts/cleanup.ps1
 ```
 
-Skriptet kräver att du skriver `yes` för att bekräfta. Observera att både `source` och `backups` tas bort tillsammans med allt innehåll.
+The script asks you to enter `yes` to confirm. Both `source` and `backups`, including all their contents, will be removed. The `config.json` file will also be removed.
 
-Efteråt kan du köra `setup-folders.ps1` igen för att skapa mapparna på nytt.
+After that, you can run `setup-folders.ps1` again to create the folders and configuration file.
 
-## Resultat
+## Results
 
-Resultatet blev en fungerande lokal backup-lösning där Terraform skapar mappstrukturen och PowerShell skapar testfiler, kopierar filer och verifierar resultatet.
+The result is a working local backup solution. Terraform creates the folders and configuration file, while PowerShell creates test files, copies files, and checks the result.
 
-Varje backupfil får ett prefix och en tidsstämpel i filnamnet, vilket gör att tidigare backuper finns kvar utan att skrivas över.
+Each backup file name includes a prefix and timestamp. This means earlier backups stay in the folder and are not overwritten.
 
-Jag har testat processen genom att ta bort mapparna och därefter återskapa dem med Terraform. Jag har också testat backupfunktionen med testfiler och kontrollerat att kopiorna skapas i rätt mapp.
+I tested the process by removing the folders and then creating them again with Terraform. I also tested the backup with test files and checked that the copies were saved in the right folder.
 
-Verifieringen kontrollerar att de skapade backupfilerna finns på plats.
+I also tested what happens when the source folder is empty. The script stops and shows a clear error message instead of creating an empty backup.
 
-Jag har även testat vad som händer när källmappen är tom. Då stannar skriptet och visar ett tydligt felmeddelande i stället för att skapa en tom backup.
+I also tested running Terraform more than once. It works as expected. If the folders and configuration file already exist and nothing needs to change, Terraform reports that no changes are needed.
 
-## Reflektion
+Terraform reported:
 
-Under projektet har jag lärt mig hur Terraform och PowerShell kan samarbeta för att automatisera uppgifter som annars hade tagit tid att utföra manuellt.
+```text
+Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
+```
 
-I PowerShell fick jag en bättre förståelse för variabler, funktioner, loopar och felhantering. Särskilt felhanteringen tyckte jag var svår i början, men den blev tydligare ju mer jag använde den.
+## What I learned
 
-Med Terraform lärde jag mig att skapa och hantera filer och mappar på ett strukturerat sätt samt hur variabler kan användas för att göra konfigurationen enklare att ändra.
+During this project, I learned how Terraform and PowerShell can work together to automate tasks that would otherwise take time to do by hand.
 
-Om jag fortsatte utveckla projektet skulle jag vilja:
+In PowerShell, I learned more about variables, functions, loops, and error handling. Error handling was difficult at first, but it became clearer as I used it more.
 
-- **Lägga till stöd för undermappar**, så att hela mappstrukturer kan säkerhetskopieras och inte bara filer på en nivå.
-- **Automatisera när backuperna körs**, så att man slipper starta dem själv varje gång.
-- **Arkivera gamla backuper**, så att de inte tar onödig plats och det blir lättare att hålla ordning på dem.
+With Terraform, I learned how to create and manage files and folders in an organized way. I also learned how variables can make settings easier to change.
 
-## AI och externa källor
+If I continue working on this project, I would like to:
 
-ChatGPT har använts som stöd under projektet för att få förklaringar, felsöka problem och diskutera kodens struktur och funktioner.
+- **Add support for subfolders**, so the backup can include whole folder structures and not just files in one folder.
+- **Schedule backups**, so they do not have to be started by hand each time.
+- **Store old backups in an archive**, to save space and keep things organized.
 
-Jag har själv gått igenom, anpassat och testat koden för att förstå hur projektets olika delar fungerar. Jag ansvarar för den slutliga lösningen och dess funktion.
+## AI and other sources
+
+I used ChatGPT to get explanations, troubleshoot problems, and discuss the code and how it is organized.
+
+I reviewed, changed, and tested the code myself to understand how the different parts of the project work. I am responsible for the final solution and how it works.
 
 ## GitHub
 
-Länk till repo: [Backup Automation – GitHub](https://github.com/Nirre23/Backup-automation)
+Repository: [Backup Automation – GitHub](https://github.com/Nirre23/Backup-automation)

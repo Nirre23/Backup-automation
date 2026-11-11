@@ -1,11 +1,10 @@
 $projectPath = Split-Path -Parent $PSScriptRoot
 
+$source = Join-Path $projectPath "source"
+$backup = Join-Path $projectPath "backups"
 $configPath = Join-Path $projectPath "config.json"
-$config = Get-Content -Path $configPath -Raw | ConvertFrom-Json
 
-$source = Join-Path $projectPath $config.sourceFolder
-$backup = Join-Path $projectPath $config.backupFolder
-# Remove folder if it exists
+# Remove a file or folder if it exists
 function Remove-ProjectFolder {
     param ([string]$path)
 
@@ -20,7 +19,7 @@ function Remove-ProjectFolder {
 
 # Ask for confirmation before deleting anything
 try {
-    Write-Host "WARNING: This will delete the source and backups folders, including all their contents!" -ForegroundColor Red
+    Write-Host "WARNING: This will delete the source and backups folders, including all their contents, and the config.json file!" -ForegroundColor Red
     $confirmation = Read-Host "Are you sure you want to continue? (yes/no)"
 
     # Only continue if the user confirms with "yes"
