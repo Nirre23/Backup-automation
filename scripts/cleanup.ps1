@@ -25,7 +25,7 @@ try {
 
     # Only continue if the user confirms with "yes"
     if ($confirmation -ieq "yes") {
-        foreach ($folder in @($source, $backup)) {
+        foreach ($folder in @($source, $backup, $configPath)) {
             Remove-ProjectFolder -path $folder
         }
 

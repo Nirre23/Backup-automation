@@ -27,6 +27,18 @@ resource "local_file" "backup_file" {
   content  = ""
 }
 
+# Create config.json
+resource "local_file" "config" {
+  filename = "${path.module}/../config.json"
+
+  content = jsonencode({
+    sourceFolder    = "source"
+    backupFolder    = "backups"
+    filePrefix      = "backup"
+    timestampFormat = "yyyy-MM-dd_HH.mm.ss"
+  })
+}
+
 # Show the path to the source folder
 output "source_directory" {
   value = dirname(local_file.source_file.filename)
@@ -35,4 +47,8 @@ output "source_directory" {
 # Show the path to the backup folder
 output "backup_directory" {
   value = dirname(local_file.backup_file.filename)
+}
+
+output "config_json"{
+  value = local_file.config.filename
 }
