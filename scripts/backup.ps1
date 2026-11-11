@@ -82,8 +82,8 @@ function Test-BackupResult {
 # Run the backup and handle any errors
 try {
     Test-BackupFolders -sourceFolder $sourceFolder -backupFolder $backupFolder
-    $backupResult = Start-Backup -sourceFolder $sourceFolder -backupFolder $backupFolder
-    Test-BackupResult -backupFolder $backupFolder -backedUpFiles $backupResult
+    $backupList = Start-Backup -sourceFolder $sourceFolder -backupFolder $backupFolder
+    Test-BackupResult -backupFolder $backupFolder -backedUpFiles $backupList
 }
 catch {
     Write-Host "Backup failed: $($_.Exception.Message)" -ForegroundColor Red
