@@ -1,41 +1,41 @@
 $projectPath = Split-Path -Parent $PSScriptRoot
 
-$configPath = Join-Path $projectPath "config.json"
-$config = Get-Content -Path $configPath -Raw | ConvertFrom-Json
+$configFilePath = Join-Path $projectPath "config.json"
+$configuration = Get-Content -Path $configFilePath -Raw | ConvertFrom-Json
 
-$source = Join-Path $projectPath $config.sourceFolder
+$sourceFolderPath = Join-Path $projectPath $configuration.sourceFolder
 # Create a new test file in the source folder
 function New-TestFile {
     param (
-        [string]$folder
+        [string]$sourceFolderPath
     )
 
     # Check that the source folder exists
-    if (!(Test-Path -LiteralPath $folder)) {
-        throw "Source folder missing: $folder"
+    if (!(Test-Path -LiteralPath $sourceFolderPath)) {
+        throw "Source folder missing: $sourceFolderPath"
     }
 
     # Find the first available file number
-    $number = 1
+    $testFileNumber = 1
 
-    while (Test-Path -LiteralPath (Join-Path $folder "test_$number.txt")) {
-        $number++
+    while (Test-Path -LiteralPath (Join-Path $sourceFolderPath "test_$testFileNumber.txt")) {
+        $testFileNumber++
     }
     # Create the file name and full file path
-    $fileName = "test_$number.txt"
-    $filePath = Join-Path $folder $fileName
+    $testFileName = "test_$testFileNumber.txt"
+    $testFilePath = Join-Path $sourceFolderPath $testFileName
 
     # Add some text and the current date and time to the file
-    $content = "Test file number $number was created $(Get-Date -Format $config.timestampFormat)"
-    Set-Content -LiteralPath $filePath -Value $content -ErrorAction Stop
+    $testFileContent = "Test file number $testFileNumber was created $(Get-Date -Format $configuration.timestampFormat)"
+    Set-Content -LiteralPath $testFilePath -Value $testFileContent -ErrorAction Stop
 
-    Write-Host "Created test file: $fileName" -ForegroundColor Green
+    Write-Host "Created test file: $testFileName" -ForegroundColor Green
 
 }
 
 # Create the test file and handle any errors
 try {
-    New-TestFile -folder $source
+    New-TestFile -sourceFolderPath $sourceFolderPath
 }
 catch {
     Write-Host "Could not create test file: $($_.Exception.Message)" -ForegroundColor Red

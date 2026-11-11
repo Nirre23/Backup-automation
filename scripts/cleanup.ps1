@@ -1,19 +1,19 @@
 $projectPath = Split-Path -Parent $PSScriptRoot
 
-$source = Join-Path $projectPath "source"
-$backup = Join-Path $projectPath "backups"
-$configPath = Join-Path $projectPath "config.json"
+$sourceFolderPath = Join-Path $projectPath "source"
+$backupFolderPath = Join-Path $projectPath "backups"
+$configFilePath = Join-Path $projectPath "config.json"
 
 # Remove a file or folder if it exists
-function Remove-ProjectFolder {
-    param ([string]$path)
+function Remove-ProjectItem {
+    param ([string]$itemPath)
 
-    if (Test-Path -LiteralPath $path) {
-        Remove-Item -LiteralPath $path -Recurse -Force -ErrorAction Stop
-        Write-Host "Removed: $path" -ForegroundColor Yellow
+    if (Test-Path -LiteralPath $itemPath) {
+        Remove-Item -LiteralPath $itemPath -Recurse -Force -ErrorAction Stop
+        Write-Host "Removed: $itemPath" -ForegroundColor Yellow
     }
     else {
-        Write-Host "Folder already missing: $path" -ForegroundColor Blue
+        Write-Host "Item already missing: $itemPath" -ForegroundColor Blue
     }
 }
 
@@ -24,11 +24,11 @@ try {
 
     # Only continue if the user confirms with "yes"
     if ($confirmation -ieq "yes") {
-        foreach ($folder in @($source, $backup, $configPath)) {
-            Remove-ProjectFolder -path $folder
+        foreach ($itemPath in @($sourceFolderPath, $backupFolderPath, $configFilePath)) {
+            Remove-ProjectItem -itemPath $itemPath
         }
 
-        Write-Host "Cleanup completed! (Missing folders were skipped)" -ForegroundColor Green
+        Write-Host "Cleanup completed! (Missing items were skipped)" -ForegroundColor Green
     }
     else {
         Write-Host "Cleanup cancelled." -ForegroundColor Yellow
