@@ -24,6 +24,6 @@ if ($LASTEXITCODE -ne 0) {
 }
 # Show success message
 
+Write-Host ""
 Write-Host "Folder setup completed successfully!" -ForegroundColor Green
-
 
