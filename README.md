@@ -6,7 +6,7 @@ The goal of this project is to build a simple local backup solution using Terraf
 
 Terraform creates the required folders and generates the project's configuration file. PowerShell creates test files and runs the backup by copying files from a source folder to a backup folder.
 
-The solution also checks that the files were copied correctly and handles errors that may happen while it runs.
+The solution checks that the backup files were created and handles errors that may happen while it runs.
 
 ## How it works
 
@@ -16,7 +16,7 @@ Terraform creates the `source` and `backups` folders.
 
 I use the Local provider and `local_file` resources to create an empty `.keep` file in each folder. This also creates the folders if they do not already exist.
 
-The `terraform/main.tf` file contains the provider settings, variables, resources, and outputs. The folder paths are set with variables, so they are easy to change.
+The `terraform/main.tf` file contains the provider settings, variables, resources, and outputs. Terraform uses variables for the source and backup folder paths. However, `config.json` uses the fixed folder names `source` and `backups`, so changing the Terraform paths alone will not update the configuration used by the PowerShell scripts.
 
 Terraform also creates the project's `config.json` file using `jsonencode()`. This file contains shared settings used by the PowerShell scripts.
 
@@ -117,7 +117,7 @@ Each backup file name includes a prefix and timestamp. This means earlier backup
 
 I tested the process by removing the folders and then creating them again with Terraform. I also tested the backup with test files and checked that the copies were saved in the right folder.
 
-I also tested what happens when the source folder is empty. The script stops and shows a clear error message instead of creating an empty backup.
+I also tested what happens when the source folder is empty. Since Terraform creates a `.keep` file in the source folder, I removed that file for the test. The script then stops and shows a clear error message instead of creating an empty backup.
 
 I also tested the idempotency of Terraform by running it more than once. It works as expected. If the folders and configuration file already exist and nothing needs to change, Terraform reports that no changes are needed.
 
