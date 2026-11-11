@@ -22,6 +22,8 @@ Terraform also creates the project's `config.json` file using `jsonencode()`. Th
 
 I have also added outputs that show the paths to the source folder, backup folder, and configuration file.
 
+The Terraform configuration is idempotent. I tested this by running the setup script multiple times. After the initial creation, Terraform detected that no changes were needed and reported 0 resources added, changed or destroyed.
+
 ### PowerShell
 
 PowerShell creates test files, runs the backup, and checks the result.
@@ -117,7 +119,7 @@ I tested the process by removing the folders and then creating them again with T
 
 I also tested what happens when the source folder is empty. The script stops and shows a clear error message instead of creating an empty backup.
 
-I also tested running Terraform more than once. It works as expected. If the folders and configuration file already exist and nothing needs to change, Terraform reports that no changes are needed.
+I also tested the idempotency of Terraform by running it more than once. It works as expected. If the folders and configuration file already exist and nothing needs to change, Terraform reports that no changes are needed.
 
 Terraform reported:
 

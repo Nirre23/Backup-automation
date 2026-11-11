@@ -49,6 +49,6 @@ output "backup_directory" {
   value = dirname(local_file.backup_file.filename)
 }
 
-output "config_json"{
+output "config_json" {
   value = local_file.config.filename
 }
