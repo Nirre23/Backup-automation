@@ -1,3 +1,4 @@
+# Get the project path and load the shared configuration
 $projectPath = Split-Path -Parent $PSScriptRoot
 
 $sourceFolderPath = Join-Path $projectPath "source"
