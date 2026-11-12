@@ -37,5 +37,5 @@ try {
     }
 }
 catch {
-    Write-Host "Cleanup failed: $($_.Exception.Message)" -ForegroundColor Red
+    throw "Cleanup failed: $($_.Exception.Message)"
 }

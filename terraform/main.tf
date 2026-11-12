@@ -15,16 +15,16 @@ variable "backup_dir" {
   description = "Destination directory where the backup files are stored"
 }
 
-# Create the source folder by adding a .keep file
+# Create the source folder information file
 resource "local_file" "source_folder" {
-  filename = "${var.source_dir}/.keep"
-  content  = ""
+  filename = "${var.source_dir}/source-info.txt"
+  content  = "This folder contains files that will be included in the backup."
 }
 
-# Create the backup folder by adding a .keep file
+# Create the backup folder information file
 resource "local_file" "backup_folder" {
-  filename = "${var.backup_dir}/.keep"
-  content  = ""
+  filename = "${var.backup_dir}/backup-info.txt"
+  content  = "This folder contains backup copies of the source files."
 }
 
 # Create config.json

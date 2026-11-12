@@ -33,11 +33,11 @@ function New-TestFile {
 try {
     $configFilePath = Join-Path $projectPath "config.json"
     $configuration = Get-Content -Path $configFilePath -Raw -ErrorAction Stop |
-        ConvertFrom-Json -ErrorAction Stop
+    ConvertFrom-Json -ErrorAction Stop
 
     $sourceFolderPath = Join-Path $projectPath $configuration.sourceFolder
     New-TestFile -sourceFolderPath $sourceFolderPath
 }
 catch {
-    Write-Host "Could not create test file: $($_.Exception.Message)" -ForegroundColor Red
+    throw "Could not create test file: $($_.Exception.Message)"
 }

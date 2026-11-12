@@ -27,8 +27,10 @@ function Start-Backup {
     # Add the current date and time to the backup file names
     $timeStamp = Get-Date -Format $config.timestampFormat
 
-    # Get all the files in the source folder
-    $sourceFiles = @(Get-ChildItem -LiteralPath $sourceFolder -File)
+    # Get all source files except source-info.txt
+    $sourceFiles = @(
+        Get-ChildItem -LiteralPath $sourceFolder -File |
+        Where-Object { $_.Name -ne "source-info.txt" })
     $fileCount = $sourceFiles.Count
 
     # Stop if there are no files to back up
@@ -77,7 +79,7 @@ function Test-BackupResult {
 try {
     $configPath = Join-Path $projectPath "config.json"
     $config = Get-Content -Path $configPath -Raw -ErrorAction Stop |
-        ConvertFrom-Json -ErrorAction Stop
+    ConvertFrom-Json -ErrorAction Stop
 
     $sourceFolder = Join-Path $projectPath $config.sourceFolder
     $backupFolder = Join-Path $projectPath $config.backupFolder
@@ -90,7 +92,15 @@ try {
 
     # Check the backup files using the list returned by Start-Backup ↓↓↓↓↓
     Test-BackupResult -backupFolder $backupFolder -backedUpFiles $backupList
+
+    # Update the last successful backup time
+    $lastBackupFilePath = Join-Path $backupFolder "last-backup.txt"
+    $backupTime = Get-Date -Format $config.timestampFormat
+
+    Set-Content -LiteralPath $lastBackupFilePath -Value "Last successful backup: $backupTime" -ErrorAction Stop
+
+    Write-Host "Last backup time updated!" -ForegroundColor Green
 }
 catch {
-    Write-Host "Backup failed: $($_.Exception.Message)" -ForegroundColor Red
+    throw "Backup failed: $($_.Exception.Message)"
 }
