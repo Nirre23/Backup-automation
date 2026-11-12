@@ -1,7 +1,7 @@
 # Get the project path
 $projectPath = Split-Path -Parent $PSScriptRoot
 
-# Check that both folders exists
+# Check that both folders exist
 function Test-BackupFolders {
     param (
         [string]$sourceFolder,
@@ -90,7 +90,7 @@ try {
     # Copy the source files and store the returned backup file names
     $backupList = Start-Backup -sourceFolder $sourceFolder -backupFolder $backupFolder
 
-    # Check the backup files using the list returned by Start-Backup ↓↓↓↓↓
+    # Check the backup files using the list returned by Start-Backup
     Test-BackupResult -backupFolder $backupFolder -backedUpFiles $backupList
 
     # Update the last successful backup time

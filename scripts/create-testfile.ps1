@@ -22,7 +22,7 @@ function New-TestFile {
     $testFilePath = Join-Path $sourceFolderPath $testFileName
 
     # Add some text and the current date and time to the file
-    $testFileContent = "Test file number $testFileNumber was created $(Get-Date -Format $configuration.timestampFormat)"
+    $testFileContent = "Test file number $testFileNumber was created $(Get-Date -Format $config.timestampFormat)"
     Set-Content -LiteralPath $testFilePath -Value $testFileContent -ErrorAction Stop
 
     Write-Host "Created test file: $testFileName" -ForegroundColor Green
@@ -32,10 +32,10 @@ function New-TestFile {
 # Create the test file and handle any errors
 try {
     $configFilePath = Join-Path $projectPath "config.json"
-    $configuration = Get-Content -Path $configFilePath -Raw -ErrorAction Stop |
-    ConvertFrom-Json -ErrorAction Stop
+    $config = Get-Content -Path $configFilePath -Raw -ErrorAction Stop |
+        ConvertFrom-Json -ErrorAction Stop
 
-    $sourceFolderPath = Join-Path $projectPath $configuration.sourceFolder
+    $sourceFolderPath = Join-Path $projectPath $config.sourceFolder
     New-TestFile -sourceFolderPath $sourceFolderPath
 }
 catch {
