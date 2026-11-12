@@ -97,7 +97,14 @@ try {
     $lastBackupFilePath = Join-Path $backupFolder "last-backup.txt"
     $backupTime = Get-Date -Format $config.timestampFormat
 
-    Set-Content -LiteralPath $lastBackupFilePath -Value "Last successful backup: $backupTime" -ErrorAction Stop
+    $backupInformation = @(
+        "Last successful backup: $backupTime"
+        ""
+        "Files included:"
+        $backupList
+    )
+
+    Set-Content -LiteralPath $lastBackupFilePath -Value $backupInformation -ErrorAction Stop
 
     Write-Host "Last backup time updated!" -ForegroundColor Green
 }
