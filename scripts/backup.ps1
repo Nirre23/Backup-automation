@@ -1,11 +1,5 @@
-# Get the project path and load the shared configuration
+# Get the project path
 $projectPath = Split-Path -Parent $PSScriptRoot
-
-$configPath = Join-Path $projectPath "config.json"
-$config = Get-Content -Path $configPath -Raw | ConvertFrom-Json
-
-$sourceFolder = Join-Path $projectPath $config.sourceFolder
-$backupFolder = Join-Path $projectPath $config.backupFolder
 
 # Check that both folders exists
 function Test-BackupFolders {
@@ -81,6 +75,13 @@ function Test-BackupResult {
 
 # Run the backup and handle any errors
 try {
+    $configPath = Join-Path $projectPath "config.json"
+    $config = Get-Content -Path $configPath -Raw -ErrorAction Stop |
+        ConvertFrom-Json -ErrorAction Stop
+
+    $sourceFolder = Join-Path $projectPath $config.sourceFolder
+    $backupFolder = Join-Path $projectPath $config.backupFolder
+
     # Make sure both folders exist before starting the backup
     Test-BackupFolders -sourceFolder $sourceFolder -backupFolder $backupFolder
 

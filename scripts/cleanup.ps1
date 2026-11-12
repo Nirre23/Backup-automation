@@ -1,6 +1,6 @@
-# Get the project path and load the shared configuration
+# Get the project root folder
 $projectPath = Split-Path -Parent $PSScriptRoot
-
+# Build paths to the source, backup and configuration file
 $sourceFolderPath = Join-Path $projectPath "source"
 $backupFolderPath = Join-Path $projectPath "backups"
 $configFilePath = Join-Path $projectPath "config.json"
@@ -25,6 +25,7 @@ try {
 
     # Only continue if the user confirms with "yes"
     if ($confirmation -ieq "yes") {
+        # Remove the source folder, backup folder, and configuration file
         foreach ($itemPath in @($sourceFolderPath, $backupFolderPath, $configFilePath)) {
             Remove-ProjectItem -itemPath $itemPath
         }

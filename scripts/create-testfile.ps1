@@ -1,9 +1,5 @@
 $projectPath = Split-Path -Parent $PSScriptRoot
 
-$configFilePath = Join-Path $projectPath "config.json"
-$configuration = Get-Content -Path $configFilePath -Raw | ConvertFrom-Json
-
-$sourceFolderPath = Join-Path $projectPath $configuration.sourceFolder
 # Create a new test file in the source folder
 function New-TestFile {
     param (
@@ -35,6 +31,11 @@ function New-TestFile {
 
 # Create the test file and handle any errors
 try {
+    $configFilePath = Join-Path $projectPath "config.json"
+    $configuration = Get-Content -Path $configFilePath -Raw -ErrorAction Stop |
+        ConvertFrom-Json -ErrorAction Stop
+
+    $sourceFolderPath = Join-Path $projectPath $configuration.sourceFolder
     New-TestFile -sourceFolderPath $sourceFolderPath
 }
 catch {
