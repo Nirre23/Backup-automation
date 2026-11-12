@@ -81,8 +81,13 @@ function Test-BackupResult {
 
 # Run the backup and handle any errors
 try {
+    # Make sure both folders exist before starting the backup
     Test-BackupFolders -sourceFolder $sourceFolder -backupFolder $backupFolder
+
+    # Copy the source files and store the returned backup file names
     $backupList = Start-Backup -sourceFolder $sourceFolder -backupFolder $backupFolder
+
+    # Check the backup files using the list returned by Start-Backup ↓↓↓↓↓
     Test-BackupResult -backupFolder $backupFolder -backedUpFiles $backupList
 }
 catch {
