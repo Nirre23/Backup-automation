@@ -120,7 +120,7 @@ I tested the process by removing the folders and then creating them again with T
 
 I also tested what happens when there are no files to back up. The script skips `source-info.txt`, so if there are no other files in the source folder, it stops and shows an error instead of creating a backup.
 
-I also tested applying Terraform more than once. If Terraform-managed files have not been changed, it reports that no changes are needed. The `last-backup.txt` file is managed by the backup script, so Terraform does not reset its contents.
+I also tested applying Terraform more than once. After applying the updated configuration for the first time, later runs report that no changes are needed as long as Terraform-managed files have not changed. The `last-backup.txt` file is managed by the backup script, so Terraform does not reset its contents.
 
 Terraform reported:
 
