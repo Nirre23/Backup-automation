@@ -22,8 +22,6 @@ terraform "-chdir=$terraformFolderPath" apply -auto-approve
 if ($LASTEXITCODE -ne 0) {
     throw "Terraform apply failed."
 }
+
 # Show success message
-
-Write-Host ""
-Write-Host "Folder setup completed successfully using Terraform!" -ForegroundColor Green
-
+Write-Host "`nFolder setup completed successfully using Terraform!" -ForegroundColor Green
