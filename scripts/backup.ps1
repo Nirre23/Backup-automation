@@ -1,7 +1,7 @@
 # Get the project path
 $projectPath = Split-Path -Parent $PSScriptRoot
 
-# Check that both folders exist
+# Check that the source and backup folders exist
 function Test-BackupFolders {
     param (
         [string]$sourceFolder,
@@ -17,7 +17,7 @@ function Test-BackupFolders {
     }
 }
 
-# Copy files from the source folder to the backup folder
+# Copy source files to the backup folder
 function Start-Backup {
     param (
         [string]$sourceFolder,
@@ -25,41 +25,49 @@ function Start-Backup {
         [string]$timeStamp
     )
 
-    # Get all source files except source-info.txt
+    # Get files directly in the source folder, excluding source-info.txt
     $sourceFiles = @(
         Get-ChildItem -LiteralPath $sourceFolder -File |
-        Where-Object { $_.Name -ne "source-info.txt" })
+            Where-Object { $_.Name -ne "source-info.txt" }
+    )
     $fileCount = $sourceFiles.Count
 
-    # Stop if there are no files to back up
+    # Stop if there are no eligible files to back up
     if ($fileCount -eq 0) {
         throw "No files found in source folder: $sourceFolder"
     }
 
-    # Copy each file with a new name and remember the names
+    # Copy each file with a prefixed name and keep track of the new names
     $backedUpFiles = @()
     foreach ($file in $sourceFiles) {
         $backupFileName = "$($config.filePrefix)_$($file.BaseName)_$timeStamp$($file.Extension)"
-        Copy-Item -LiteralPath $file.FullName -Destination (Join-Path $backupFolder $backupFileName) -ErrorAction Stop
+        $destinationPath = Join-Path $backupFolder $backupFileName
+
+        Copy-Item `
+            -LiteralPath $file.FullName `
+            -Destination $destinationPath `
+            -ErrorAction Stop
+
         $backedUpFiles += $backupFileName
     }
-
 
     Write-Host "Backup completed! Files copied: $fileCount" -ForegroundColor Green
     return $backedUpFiles
 }
 
-# Check that the backup files were created
+# Verify that each expected backup file was created
 function Test-BackupResult {
     param (
         [string]$backupFolder,
         [string[]]$backedUpFiles
     )
 
-    # Collect the names of any files that are missing
+    # Collect the names of any expected files that are missing
     $missingFiles = @()
     foreach ($file in $backedUpFiles) {
-        if (!(Test-Path -LiteralPath (Join-Path $backupFolder $file))) {
+        $backupFilePath = Join-Path $backupFolder $file
+
+        if (!(Test-Path -LiteralPath $backupFilePath)) {
             $missingFiles += $file
         }
     }
@@ -73,11 +81,11 @@ function Test-BackupResult {
     }
 }
 
-# Run the backup and handle any errors
+# Load the configuration, run the backup, and handle any errors
 try {
     $configPath = Join-Path $projectPath "config.json"
     $config = Get-Content -Path $configPath -Raw -ErrorAction Stop |
-    ConvertFrom-Json -ErrorAction Stop
+        ConvertFrom-Json -ErrorAction Stop
 
     $sourceFolder = Join-Path $projectPath $config.sourceFolder
     $backupFolder = Join-Path $projectPath $config.backupFolder
@@ -89,14 +97,16 @@ try {
     $backupTime = Get-Date -Format $config.timestampFormat
 
     # Copy the source files and store the returned backup file names
-    $backupList = Start-Backup -sourceFolder $sourceFolder -backupFolder $backupFolder -timeStamp $backupTime
+    $backupList = Start-Backup `
+        -sourceFolder $sourceFolder `
+        -backupFolder $backupFolder `
+        -timeStamp $backupTime
 
     # Check the backup files using the list returned by Start-Backup
     Test-BackupResult -backupFolder $backupFolder -backedUpFiles $backupList
 
     # Update the last successful backup time
     $lastBackupFilePath = Join-Path $backupFolder "last-backup.txt"
-
     $backupInformation = @(
         "Last successful backup: $backupTime"
         ""
@@ -104,7 +114,10 @@ try {
         $backupList
     )
 
-    Set-Content -LiteralPath $lastBackupFilePath -Value $backupInformation -ErrorAction Stop
+    Set-Content `
+        -LiteralPath $lastBackupFilePath `
+        -Value $backupInformation `
+        -ErrorAction Stop
 
     Write-Host "Last backup time updated!" -ForegroundColor Green
 }
