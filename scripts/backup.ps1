@@ -21,11 +21,9 @@ function Test-BackupFolders {
 function Start-Backup {
     param (
         [string]$sourceFolder,
-        [string]$backupFolder
+        [string]$backupFolder,
+        [string]$timeStamp
     )
-
-    # Add the current date and time to the backup file names
-    $timeStamp = Get-Date -Format $config.timestampFormat
 
     # Get all source files except source-info.txt
     $sourceFiles = @(
@@ -87,15 +85,17 @@ try {
     # Make sure both folders exist before starting the backup
     Test-BackupFolders -sourceFolder $sourceFolder -backupFolder $backupFolder
 
+    # Create one timestamp for the backup file names and metadata
+    $backupTime = Get-Date -Format $config.timestampFormat
+
     # Copy the source files and store the returned backup file names
-    $backupList = Start-Backup -sourceFolder $sourceFolder -backupFolder $backupFolder
+    $backupList = Start-Backup -sourceFolder $sourceFolder -backupFolder $backupFolder -timeStamp $backupTime
 
     # Check the backup files using the list returned by Start-Backup
     Test-BackupResult -backupFolder $backupFolder -backedUpFiles $backupList
 
     # Update the last successful backup time
     $lastBackupFilePath = Join-Path $backupFolder "last-backup.txt"
-    $backupTime = Get-Date -Format $config.timestampFormat
 
     $backupInformation = @(
         "Last successful backup: $backupTime"
