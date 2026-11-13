@@ -32,7 +32,7 @@ The backup script:
 
 - Checks that the source and backup folders exist.
 - Gets files directly from the source folder, except for `source-info.txt`. It does not search subfolders.
-- Copies the files to the backup folder with a prefix and timestamp in each file name.
+- Creates one timestamp per backup run and uses it in each backup file name and in `last-backup.txt`.
 - Saves the names of the new files in a list.
 - Checks that the backup files exist.
 - Creates or updates `last-backup.txt` after the backup files have been checked. The file records the time of the successful backup and lists the files that were copied.
