@@ -15,7 +15,7 @@ if ($LASTEXITCODE -ne 0) {
     throw "Terraform initialization failed."
 }
 
-# Apply the Terraform configuration without confirmation
+# Apply the configuration to create the folders and config.json
 terraform "-chdir=$terraformFolderPath" apply -auto-approve
 
 # Check if folder creation was successful
