@@ -3,5 +3,4 @@
 *.tfstate.*
 backups/*
 !backups/backup-info.txt
-!backups/.keep
 source/test*
