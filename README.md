@@ -16,7 +16,7 @@ Terraform creates the `source` and `backups` folders.
 
 I use the Local provider and `local_file` resources to create information files in the folders: `source-info.txt` in `source` and `backup-info.txt` in `backups`. These files also cause the folders to be created if they do not already exist.
 
-The `terraform/main.tf` file contains the provider settings, variables, resources, and outputs. Terraform uses variables for the source and backup folder paths. However, `config.json` uses the fixed folder names `source` and `backups`, so changing the Terraform paths alone will not update the configuration used by the PowerShell scripts.
+The `terraform/main.tf` file contains the provider settings, variables, resources, and outputs. Terraform uses variables for the source and backup folder names, and writes those same values to `config.json`. This keeps the folders created by Terraform in sync with the paths used by the PowerShell scripts.
 
 Terraform also creates the project's `config.json` file using `jsonencode()`. This file contains shared settings used by the PowerShell scripts.
 
